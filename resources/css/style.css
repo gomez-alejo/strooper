@@ -1,0 +1,13 @@
+        :root {
+            --primary-pink: #E91E63;
+            --primary-purple: #9C27B0;
+            --accent-yellow: #FFC107;
+            --accent-blue: #2196F3;
+            --accent-orange: #FF5722;
+            --dark-bg: #1A1A2E;
+            --light-bg: #16213E;
+            --text-light: #FFFFFF;
+            --text-dark: #333333;
+            --gradient-primary: linear-gradient(135deg, var(--primary-pink) 0%, var(--primary-purple) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-purple) 100%);
+        }
