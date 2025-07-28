@@ -263,14 +263,49 @@ function confirmExitGame() {
     }
 }
 
-function showResultsModal() {
-    const accuracy = gameState.wordsShown > 0 ? Math.round((gameState.correctAnswers / gameState.wordsShown) * 100) : 0;
+async function showResultsModal() {
+    // Calcular métricas
+    const accuracy = gameState.wordsShown > 0 ? 
+        Math.round((gameState.correctAnswers / gameState.wordsShown) * 100) : 0;
     const avgReactionTime = gameState.reactionTimes.length > 0 ?
         Math.round(gameState.reactionTimes.reduce((a, b) => a + b, 0) / gameState.reactionTimes.length) : 0;
     const incorrectAnswers = gameState.wordsShown - gameState.correctAnswers;
     const gameDuration = Math.round((gameState.gameEndTime - gameState.gameStartTime) / 1000);
 
-    // Update results display
+    // Preparar datos para enviar al servidor
+    const gameData = {
+        level: capitalizeFirstLetter(gameState.difficulty),
+        mode: gameState.mode === 'classic' ? 'Clásico' : 'Competitivo',
+        words_shown: gameState.wordsShown,
+        correct_words: gameState.correctAnswers,
+        incorrect_words: incorrectAnswers,
+        accuracy: accuracy,
+        reaction_time: avgReactionTime,
+        duration: gameDuration
+    };
+
+    try {
+        const response = await fetch('/games', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify(gameData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al guardar los resultados');
+        }
+
+        const result = await response.json();
+        console.log('Resultados guardados:', result);
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
+
+    // Mostrar resultados en el modal
     document.getElementById('finalWordsShown').textContent = gameState.wordsShown;
     document.getElementById('finalCorrectWords').textContent = gameState.correctAnswers;
     document.getElementById('finalIncorrectWords').textContent = incorrectAnswers;
@@ -278,27 +313,16 @@ function showResultsModal() {
     document.getElementById('finalReactionTime').textContent = avgReactionTime + 'ms';
     document.getElementById('finalGameDuration').textContent = gameDuration + 's';
 
-    // Update game mode display
-    let modeText = gameState.mode === 'classic' ? 'Modo Clásico' : `Modo Competitivo - ${gameState.difficulty.toUpperCase()}`;
+    let modeText = gameState.mode === 'classic' ? 'Modo Clásico' : `Modo Competitivo - ${capitalizeFirstLetter(gameState.difficulty)}`;
     document.getElementById('gameModeDisplay').textContent = modeText;
 
-    // Update performance badge
-    const performanceBadge = document.getElementById('performanceBadge');
-    if (accuracy >= 90) {
-        performanceBadge.textContent = '🏆 ¡Excelente!';
-        performanceBadge.style.background = 'linear-gradient(135deg, #FFD700, #FFA500)';
-    } else if (accuracy >= 75) {
-        performanceBadge.textContent = '🥈 ¡Muy Bien!';
-        performanceBadge.style.background = 'linear-gradient(135deg, #C0C0C0, #808080)';
-    } else if (accuracy >= 60) {
-        performanceBadge.textContent = '🥉 ¡Bien!';
-        performanceBadge.style.background = 'linear-gradient(135deg, #CD7F32, #A0522D)';
-    } else {
-        performanceBadge.textContent = '💪 ¡Sigue Practicando!';
-        performanceBadge.style.background = 'linear-gradient(135deg, #4CAF50, #2E7D32)';
-    }
-
     resultsModal.classList.remove('hidden');
+}
+
+
+// Función auxiliar para capitalizar la primera letra
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
 function shareOnFacebook() {

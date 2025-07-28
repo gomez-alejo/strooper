@@ -118,14 +118,22 @@
                     <p class="text-xl lg:text-2xl text-gray-100 leading-relaxed">
                         Prueba la famosa prueba de Stroop y descubre qué tan rápido puedes identificar cuando el nombre de un color coincide con el color del texto.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <button class="btn-primary text-lg px-8 py-4">
+                    <!-- En la sección Hero -->
+                <div class="flex flex-col sm:flex-row gap-4">
+                @auth
+                <a href="{{ route('play') }}" class="btn-primary text-lg px-8 py-4">
+                🎮 JUGAR AHORA
+                        </a>
+                @else
+                        <a href="{{ route('register') }}" class="btn-primary text-lg px-8 py-4">
                             🎮 JUGAR AHORA
+                        </a>
+                    @endauth
+                    <button id="startTrialBtn" class="btn-secondary text-lg px-8 py-4">
+                        Ver Demo
                         </button>
-                        <button class="btn-secondary text-lg px-8 py-4">
-                            Ver Demo
-                        </button>
-                    </div>
+                </div>
+
                     <div class="flex items-center space-x-4 text-sm">
                         <span>Colores disponibles:</span>
                         <div class="flex space-x-2">
